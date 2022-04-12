@@ -1,0 +1,18 @@
+*.pyc
+__pycache__
+
+# IPython Notebook Checkpoints
+.ipynb_checkpoints
+
+# PyCharm project file
+.idea
+Lib
+Scripts
+
+# Environments
+env/
+venv/
+pyvenv.cfg
+
+# data for analysis
+datasets/
