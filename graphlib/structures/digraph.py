@@ -7,9 +7,15 @@ class Graph:
         if nodes is None:
             self._nodes = set()
         else:
-            self._nodes = nodes
+            self._nodes = set(nodes)
         # список смежности для каждой вершины;
         self._edges = dict([(node, set()) for node in self._nodes])
+
+    @property
+    def nodes(self):
+        # вершины графа
+        return self._nodes
+
 
     @property
     def nodes_count(self):
