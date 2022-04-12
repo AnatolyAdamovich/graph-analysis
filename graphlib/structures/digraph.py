@@ -9,13 +9,12 @@ class Graph:
         else:
             self._nodes = set(nodes)
         # список смежности для каждой вершины;
-        self._edges = dict([(node, set()) for node in self._nodes])
+        self._edges = dict([(node, []) for node in self._nodes])
 
     @property
     def nodes(self):
         # вершины графа
         return self._nodes
-
 
     @property
     def nodes_count(self):
@@ -31,7 +30,7 @@ class Graph:
     def add_node(self, u):
         # добавление вершины
         self._nodes.add(u)
-        self._edges[u] = set()
+        self._edges[u] = []
 
     def add_edge(self, u, v):
         # добавление ребра
@@ -40,8 +39,8 @@ class Graph:
         if v not in self._nodes:
             self.add_node(v)
         if v not in self._edges[u]:
-            self._edges[u].add(v)
-            self._edges[v].add(u)
+            self._edges[u].append(v)
+            self._edges[v].append(u)
 
     def neighbors_for_node(self, u):
         return self._edges[u]
