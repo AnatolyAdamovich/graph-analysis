@@ -19,9 +19,10 @@ def BFS_geodesic(graph, start_u, largest=False):
         largest : bool
             Если True, то возвращает наибольшее расстояние от заданной вершины
 
-    Функция возвращает словарь, в котором для каждой вершины
-     указано геодезическое расстояние
-        """
+    Возвращает:
+        - эксцентриситет каждой вершины
+
+    """
     dist = dict([(node, -1) for node in graph.nodes])
     dist[start_u] = 0
     available_nodes = deque()
