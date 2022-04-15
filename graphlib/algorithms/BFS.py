@@ -67,7 +67,7 @@ def BFS_search(graph, start_u, finish_v, length=False):
                     path.append(parent_state.node)
                     parent_state = parent_state.parent
                 if length:
-                    return len(path)
+                    return len(path)-1
                 return list(reversed(path))
             if v not in visited:
                 visited.add(v)
