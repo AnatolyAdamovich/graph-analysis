@@ -39,10 +39,41 @@ def BFS_geodesic(graph, start_u, largest=False):
     return dist
 
 
+class StateOfNode:
+    # вершина и её предок
+    # (для восстановления кратчайшего пути)
+    def __init__(self, v, parent_state):
+        self.node = v
+        self.parent = parent_state
 
-def BFS_with_search(graph, start_u, finish_v):
-    # поиск кратчайшего пути (по числу ребер) между двумя вершинами
+
+def BFS_search(graph, start_u, finish_v, length=False):
+    # поиск кратчайшего (по числу ребер) пути между двумя вершинами
     available_nodes = deque()
-    visited = set()
+    start_state = StateOfNode(start_u, None)
+
+    available_nodes.append(start_state)
+    visited = {start_u}
+
+    while available_nodes:
+        current_state = (available_nodes.popleft())
+        current_node = current_state.node
+        for v in graph.neighbors_for_node(current_node):
+            if v == finish_v:
+                # восстанавливаем путь
+                path = [finish_v, current_node]
+                parent_state = current_state.parent
+                while parent_state:
+                    path.append(parent_state.node)
+                    parent_state = parent_state.parent
+                if length:
+                    return len(path)
+                return list(reversed(path))
+            if v not in visited:
+                visited.add(v)
+                new_state = StateOfNode(v, current_state)
+                available_nodes.append(new_state)
+    # если пути не обнаружено
+    return None
 
 
