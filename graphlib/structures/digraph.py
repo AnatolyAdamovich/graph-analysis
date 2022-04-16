@@ -4,7 +4,7 @@ import random
 
 class Graph:
     def __init__(self, name='null', nodes=None, edges=None):
-        self._name = name
+        self.name = name
 
         if nodes is None:
             self._nodes = set()
