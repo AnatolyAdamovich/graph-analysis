@@ -7,7 +7,7 @@ from itertools import combinations
 def density(graph):
     e = graph.edges_count
     k_graph_edges = 0.5 * e * (e - 1)
-    return e / k_graph_edges
+    return round(e / k_graph_edges, 4)
 
 
 # доля вершин в подграфе

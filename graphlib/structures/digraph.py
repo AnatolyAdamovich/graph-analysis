@@ -69,7 +69,7 @@ class Graph:
         return self._edges[u]
 
     def __str__(self):
-        result = f'Graph <{self._name}> with {self.nodes_count} nodes and {self.edges_count} edges'
+        result = f'Graph <{self.name}> with {self.nodes_count} nodes and {self.edges_count} edges'
         return result
 
     def random_selection(self, x):
@@ -90,7 +90,7 @@ class Graph:
         sub_edges = dict([(node, [adj_node for adj_node in self._edges[node] if adj_node in sub_nodes])
                           for node in sub_nodes])
 
-        subgraph = Graph(name='subgraph::' + self._name,
+        subgraph = Graph(name='subgraph::' + self.name,
                          nodes=sub_nodes,
                          edges=sub_edges)
         return subgraph
