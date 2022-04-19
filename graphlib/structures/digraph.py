@@ -73,9 +73,25 @@ class Graph:
         return result
 
     def random_selection(self, x):
-        # случайный выбор 'x' вершин из графа
+        # случайный выбор x вершин из графа
         new_nodes = random.sample(self.nodes, k=x)
         return new_nodes
+
+    def node_degrees(self):
+        # возвращение вершин со степенью смежности (list with tuples)
+        deg = list(map(lambda node: (node[0], len(node[1])), self.edges.items()))
+        return sorted(deg, key=lambda node: node[1], reverse=True)
+
+    def random_removing(self, k, most_degree=False):
+        # удаление k случайных вершин в графе
+        if most_degree:
+            nodes_for_removing = self.node_degrees()
+            nodes_for_removing = set(map(lambda node: node[0], nodes_for_removing[:k]))
+            saved_nodes = self.nodes - nodes_for_removing
+            return self.subgraph(nodes=saved_nodes)
+
+        saved_nodes = self.random_selection(self.nodes_count - k)
+        return self.subgraph(nodes=saved_nodes)
 
     def subgraph(self, nodes=None, x=3):
         # подграф исходного графа
