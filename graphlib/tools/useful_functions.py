@@ -7,7 +7,7 @@ from itertools import combinations
 def density(graph):
     e = graph.edges_count
     k_graph_edges = 0.5 * e * (e - 1)
-    return round(e / k_graph_edges, 4)
+    return e / k_graph_edges
 
 
 # доля вершин в подграфе
@@ -91,5 +91,16 @@ def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
     if with_nodes:
         return r, node1, node2
     return r
+
+
+# Пусть степень вершины - это случайная величина.
+# Считаем относительные частоты. Например, всего N вершин.
+# Среди них M вершин имеют степень равную 10. Значит
+# M/N  - вероятность того, что вершина имеет степень равную 10
+# и т.д.
+def degrees_probability(nodes):
+    pass
+
+
 
 
