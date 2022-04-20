@@ -1,6 +1,5 @@
 '''Функции для анализа графов и др.'''
 from ..algorithms import BFS_geodesic, BFS_search
-from itertools import combinations
 
 
 # плотность графа
@@ -32,7 +31,7 @@ def diameter(graph, with_node=False, approximate=False):
 # оценка диаметра
 def diameter_approximate(graph, number=500, nodes=None, with_nodes=False):
     if nodes is None:
-        nodes = list(graph.random_selection(x=number))
+        nodes = list(graph.selection(x=number))
     else:
         nodes = list(nodes)
     d = 0
@@ -68,7 +67,7 @@ def radius(graph, with_central=False):
 # оценка радиуса (наименьшее расстояние из наибольших)
 def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
     if nodes is None:
-        nodes = list(graph.random_selection(x=number))
+        nodes = list(graph.selection(x=number))
     else:
         nodes = list(nodes)
     r = 1000000000
