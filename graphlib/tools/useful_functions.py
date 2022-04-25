@@ -14,6 +14,22 @@ def proportion_of_subgraph(subgraph, graph):
     return subgraph.nodes_count / graph.nodes_count
 
 
+def geodesic_percentile_approximate(graph, number=500, percent=50):
+    nodes = list(graph.selection(x=number))
+    list_with_distances = []
+    while nodes:
+        u = nodes.pop()
+        for v in nodes:
+            d = BFS_search(graph, start_u=u, finish_v=v, length=True)
+            list_with_distances.append(d)
+    list_with_distances.sort()
+    n = len(list_with_distances)
+    index_of_percentile = round(n*(percent/100))
+    return list_with_distances[index_of_percentile]
+
+
+
+
 # диаметр графа
 def diameter(graph, with_node=False, approximate=False):
     d = -1
@@ -36,7 +52,7 @@ def diameter_approximate(graph, number=500, nodes=None, with_nodes=False):
         nodes = list(nodes)
     d = 0
     node1, node2 = None, None
-    for i in range(len(nodes)):
+    for i in range(len(nodes)-1):
         u = nodes[i]
         for j in range(i+1, len(nodes)):
             v = nodes[j]
@@ -72,13 +88,11 @@ def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
         nodes = list(nodes)
     r = 1000000000
     node1, node2 = None, None
-    for i in range(len(nodes)-1):
-        u = nodes[i]
+    for u in nodes:
         max_geodesic_dist_for_u = 0
         tmp_node = None
         # поиск наибольшего расстояния между 'u' и другой вершиной
-        for j in range(i+1, len(nodes)):
-            v = nodes[j]
+        for v in nodes:
             geo_dist = BFS_search(graph, start_u=u, finish_v=v, length=True)
             if geo_dist > max_geodesic_dist_for_u:
                 max_geodesic_dist_for_u = geo_dist
@@ -99,7 +113,6 @@ def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
 # и т.д.
 def degrees_probability(nodes):
     pass
-
 
 
 

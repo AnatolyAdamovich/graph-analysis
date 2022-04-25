@@ -49,6 +49,8 @@ class StateOfNode:
 
 def BFS_search(graph, start_u, finish_v, length=False):
     # поиск кратчайшего (по числу ребер) пути между двумя вершинами
+    if start_u == finish_v:
+        return 0
     available_nodes = deque()
     start_state = StateOfNode(start_u, None)
 
