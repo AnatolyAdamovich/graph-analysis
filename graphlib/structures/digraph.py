@@ -1,5 +1,6 @@
 '''Cтруктура данных для неориентированного невзвешенного графа'''
 import random
+from .simple_graph import Graph
 
 
 class Digraph:
@@ -76,10 +77,15 @@ class Digraph:
         return result
 
     # ---------------------------------------ДОПОЛНИТЕЛЬНОЕ---------------------------------------------
-    def node_degrees(self):
-        # возвращение вершин со степенью смежности (list with tuples)
+    def node_degrees(self, positive=True):
+        # степени вершин
         # в отсортированном по убыванию порядке: ('A', 10), ('B', 9), ...
-        deg = list(map(lambda node: (node[0], len(node[1])), self.edges.items()))
+        if positive:
+            # степень как число исходящих дуг
+            deg = list(map(lambda node: (node[0], len(node[1])), self.edges.items()))
+        else:
+            # степень как число входящих дуг (ДОДЕЛАТЬ)
+            deg = 0
         return sorted(deg, key=lambda node: node[1], reverse=True)
 
     def selection(self, x, most_degree=False):
@@ -111,3 +117,12 @@ class Digraph:
                            nodes=sub_nodes,
                            edges=sub_edges)
         return subgraph
+
+    def to_simple(self):
+        # конвертирование графа в неориентированный
+        simple = Graph(name=f'неориентированный граф, лежащий в основе {self.name}', nodes=self.nodes)
+        for elem in self._edges.items():
+            node, adj_list = elem
+            for j in adj_list:
+                simple.add_edge(node, j)
+        return simple
