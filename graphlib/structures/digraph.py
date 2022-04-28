@@ -126,3 +126,11 @@ class Digraph:
             for j in adj_list:
                 simple.add_edge(node, j)
         return simple
+
+    def invert(self):
+        # инвертированный граф (перевернуть все дуги)
+        invert_graph = Digraph(nodes=self.nodes)
+        for node in self._nodes:
+            for adj_node in self._edges[node]:
+                invert_graph.add_edge(adj_node, node)
+        return invert_graph
