@@ -1,1 +1,1 @@
-from .digraph import *
+from .simple_graph import *
