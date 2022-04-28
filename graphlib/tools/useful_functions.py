@@ -24,7 +24,7 @@ def geodesic_percentile_approximate(graph, number=500, percent=50):
             list_with_distances.append(d)
     list_with_distances.sort()
     n = len(list_with_distances)
-    index_of_percentile = round(n*(percent/100))
+    index_of_percentile = round(n*(percent/100))-1
     return list_with_distances[index_of_percentile]
 
 
