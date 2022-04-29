@@ -24,7 +24,6 @@ def DFS_with_cc(graph, largest=False):
     visited = set()
     cc = dict()
     cc_num = 0
-
     for node in graph.nodes:
         if node not in visited:
             cc_num += 1
