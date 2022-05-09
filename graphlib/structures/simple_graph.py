@@ -44,6 +44,13 @@ class Graph:
         # Лемма: [ sum(deg(node)) foreach node in G ] = 2 * |E|
         return int((sum(map(len, self._edges.values()))) / 2)
 
+    def edges_list(self):
+        edges = set()
+        for v in self._nodes:
+            for u in self.neighbors_for_node(v):
+                edges.add((v, u))
+        return edges
+
     def change_name(self, new_name):
         self.name = new_name
 
