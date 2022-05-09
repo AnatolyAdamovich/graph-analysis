@@ -12,25 +12,24 @@ def weakly_components(digraph, largest=False):
 # компоненты сильной связности
 # предпочтительнее использовать алгоритм Тарьяна (всего один обход в глубину)
 def strongly_components_tarjan(digraph):
-    time_in = dict()     # время входа в вершину
-    ret = dict()         # куда можно вернуться из вершины
+    time_in = {}     # время входа в вершину
+    ret = {}         # куда можно вернуться из вершины
     used = set()         # вершины, для которых определена компонента
-
     queue_for_scc = []
-    number_of_scc = 0
-    scc = {}
+    time = 0
+    neighbors = {v: iter(digraph.neighbors_for_node(v))
+                 for v in digraph.edges}
 
-    time = 1
     for node in digraph.nodes:
         if node not in used:
             available_nodes = [node]
             while available_nodes:
                 u = available_nodes[-1]
                 if u not in time_in:
-                    time_in[u] = time
                     time += 1
+                    time_in[u] = time
                 leaf = True
-                for v in digraph.neighbors_for_node(u):
+                for v in neighbors[u]:
                     if v not in time_in:
                         available_nodes.append(v)
                         leaf = False
@@ -45,15 +44,14 @@ def strongly_components_tarjan(digraph):
                                 ret[u] = min([ret[u], time_in[v]])
                     available_nodes.pop()
                     if ret[u] == time_in[u]:
-                        number_of_scc += 1
-                        scc[number_of_scc] = set(u)
+                        scc = {u}
                         while queue_for_scc and time_in[queue_for_scc[-1]] > time_in[u]:
                             new_node_to_scc = queue_for_scc.pop()
-                            scc[number_of_scc].add(new_node_to_scc)
-                        used.update(scc[number_of_scc])
+                            scc.add(new_node_to_scc)
+                        used.update(scc)
+                        yield scc
                     else:
                         queue_for_scc.append(u)
-    return scc
 
 
 # альтернатива - алгоритм Косарайю (два обхода в глубину + рекурсивный DFS)
