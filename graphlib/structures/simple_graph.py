@@ -48,7 +48,8 @@ class Graph:
         edges = set()
         for v in self._nodes:
             for u in self.neighbors_for_node(v):
-                edges.add((v, u))
+                if (u, v) not in edges:
+                    edges.add((v, u))
         return edges
 
     def change_name(self, new_name):
@@ -129,3 +130,8 @@ class Graph:
                          nodes=sub_nodes,
                          edges=sub_edges)
         return subgraph
+
+    def adj_nodes_checking(self, u, v):
+        if v in self.neighbors_for_node(u):
+            return True
+        return False

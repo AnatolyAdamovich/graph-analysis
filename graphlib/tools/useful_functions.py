@@ -28,8 +28,6 @@ def geodesic_percentile_approximate(graph, number=500, percent=50):
     return list_with_distances[index_of_percentile]
 
 
-
-
 # диаметр графа
 def diameter(graph, with_node=False, approximate=False):
     d = -1
@@ -113,6 +111,24 @@ def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
 # и т.д.
 def degrees_probability(nodes):
     pass
+
+
+# число треугольников в неориентированном графе
+# перебираются все ребра (u,v) графа
+#    для всех соседей вершины u проверяется:
+#    сосед смежен с вершиной v?
+#    если да, то это очередной треугольник
+# разделить число найденных треугольников на 3
+def simple_triangles(graph):
+    count = 0
+    all_edges = graph.edges_list()
+    for (u, v) in all_edges:
+        if u != v:
+            for w in graph.neighbors_for_node(u):
+                if w != u and w != v:
+                    if (w, v) in all_edges or (v, w) in all_edges:
+                        count += 1
+    return count / 3
 
 
 
