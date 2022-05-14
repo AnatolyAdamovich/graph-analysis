@@ -119,16 +119,41 @@ def degrees_probability(nodes):
 #    сосед смежен с вершиной v?
 #    если да, то это очередной треугольник
 # разделить число найденных треугольников на 3
+# !!! Важно, чтобы проверялись РАЗНЫЕ вершины
 def simple_triangles(graph):
     count = 0
-    all_edges = graph.edges_list()
+    all_edges = iter(graph.edges_list())
     for (u, v) in all_edges:
         if u != v:
             for w in graph.neighbors_for_node(u):
                 if w != u and w != v:
-                    if (w, v) in all_edges or (v, w) in all_edges:
+                    if graph.adj_nodes_checking(w, v):
                         count += 1
-    return count / 3
+    return int(count / 3)
 
+
+# Для каждой вершины графа можно посчитать его коэффициент
+# кластеризации. Он будет показывать вероятность того,
+# что две смежные к данной вершины тоже будут являться соседями
+
+# Средний кластерный коэффициент: средний коэффициент кластеризации (усредненная сумма коэффициентов)
+def average_clustering_coefficient(graph):
+    result = 0
+    for u in graph.nodes:
+        deg = 0
+        edges_number = 0
+        neighbors = list(set(graph.neighbors_for_node(u)))
+        if u in neighbors:
+            neighbors.remove(u)
+        for v in graph.neighbors_for_node(u):
+            deg += 1
+            for w in graph.neighbors_for_node(u):
+                if w != v and graph.adj_nodes_checking(v, w):
+                    edges_number += 1
+        if deg < 2:
+            continue
+        else:
+            result += edges_number / (deg * (deg-1))
+    return result / graph.nodes_count
 
 
