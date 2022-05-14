@@ -1,5 +1,4 @@
 ''' Поиск компонент слабой и сильной связности в графах '''
-from collections import deque
 from .DFS import *
 
 
