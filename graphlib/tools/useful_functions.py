@@ -120,7 +120,7 @@ def degrees_probability(nodes):
 #    если да, то это очередной треугольник
 # разделить число найденных треугольников на 3
 # !!! Важно, чтобы проверялись РАЗНЫЕ вершины
-def simple_triangles(graph):
+def number_of_triangles(graph):
     count = 0
     all_edges = iter(graph.edges_list())
     for (u, v) in all_edges:
@@ -135,25 +135,58 @@ def simple_triangles(graph):
 # Для каждой вершины графа можно посчитать его коэффициент
 # кластеризации. Он будет показывать вероятность того,
 # что две смежные к данной вершины тоже будут являться соседями
+def local_clustering_coefficient(graph, vertex):
+    # neighbors = list(set(graph.neighbors_for_node(vertex)))
+    # if vertex in neighbors:
+    #     neighbors.remove(vertex)
+    neighbors = graph.adj_nodes(vertex)
+    deg = len(neighbors)
+    if deg < 2:
+        return 0
+    edges_number = 0
+    if vertex in neighbors:
+        neighbors.remove(vertex)
+    for v in neighbors:
+        for w in neighbors:
+            if w != v and graph.adj_nodes_checking(v, w):
+                edges_number += 1
+    return edges_number/(deg*(deg-1))
 
-# Средний кластерный коэффициент: средний коэффициент кластеризации (усредненная сумма коэффициентов)
+
+# Средний кластерный коэффициент: средний коэффициент кластеризации
+# (усредненная сумма коэффициентов)
 def average_clustering_coefficient(graph):
     result = 0
     for u in graph.nodes:
-        deg = 0
-        edges_number = 0
-        neighbors = list(set(graph.neighbors_for_node(u)))
-        if u in neighbors:
-            neighbors.remove(u)
-        for v in graph.neighbors_for_node(u):
-            deg += 1
-            for w in graph.neighbors_for_node(u):
-                if w != v and graph.adj_nodes_checking(v, w):
-                    edges_number += 1
-        if deg < 2:
-            continue
-        else:
-            result += edges_number / (deg * (deg-1))
+        result += local_clustering_coefficient(graph, u)
+        # deg = 0
+        # edges_number = 0
+        # neighbors = list(set(graph.neighbors_for_node(u)))
+        # if u in neighbors:
+        #     neighbors.remove(u)
+        # for v in neighbors:
+        #     deg += 1
+        #     for w in neighbors:
+        #         if w != v and graph.adj_nodes_checking(v, w):
+        #             edges_number += 1
+        # if deg < 2:
+        #     continue
+        # else:
+        #     result += edges_number / (deg * (deg-1))
     return result / graph.nodes_count
 
 
+# подсчет открытых треугольников в графе
+def global_clustering_coefficient(graph):
+    numerator, denominator = 0, 0
+    # n * (n-1) * (1/2) - number of triplets for node
+    # where n = number of neighbors
+    for vertex in graph.nodes:
+        local_cluster = local_clustering_coefficient(graph, vertex)
+        deg = len(graph.adj_nodes(vertex))
+        if deg >= 2:
+            binomial_coeff = deg * (deg-1) / 2
+            numerator += (local_cluster * binomial_coeff)
+            denominator += binomial_coeff
+
+    return numerator/denominator
