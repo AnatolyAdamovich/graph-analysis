@@ -79,6 +79,12 @@ class Graph:
     def neighbors_for_node(self, u):
         return self._edges[u]
 
+    def adj_nodes(self, vertex):
+        neighbors = list(set(self.neighbors_for_node(vertex)))
+        if vertex in neighbors:
+            neighbors.remove(vertex)
+        return neighbors
+
     def __str__(self):
         result = f'Граф <{self.name}> с {self.nodes_count} вершинами and {self.edges_count} ребрами'
         return result
