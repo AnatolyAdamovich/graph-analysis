@@ -29,7 +29,7 @@ def BFS_geodesic(graph, start_u, largest=False):
     available_nodes.append(start_u)
     while available_nodes:
         current_node = available_nodes.popleft()
-        for v in graph.neighbors_for_node(current_node):
+        for v in graph.adj_nodes(current_node):
             if dist[v] == -1:
                 available_nodes.append(v)
                 dist[v] = dist[current_node] + 1
@@ -60,7 +60,7 @@ def BFS_search(graph, start_u, finish_v, length=False):
     while available_nodes:
         current_state = (available_nodes.popleft())
         current_node = current_state.node
-        for v in graph.neighbors_for_node(current_node):
+        for v in graph.adj_nodes(current_node):
             if v == finish_v:
                 # восстанавливаем путь
                 path = [finish_v, current_node]

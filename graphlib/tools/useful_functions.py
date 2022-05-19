@@ -1,5 +1,6 @@
 '''Функции для анализа графов и др.'''
 from ..algorithms import BFS_geodesic, BFS_search
+import numpy as np
 
 
 # плотность графа
@@ -14,6 +15,7 @@ def proportion_of_subgraph(subgraph, graph):
     return subgraph.nodes_count / graph.nodes_count
 
 
+# квантиль расстояния
 def geodesic_percentile_approximate(graph, number=500, percent=50):
     nodes = list(graph.selection(x=number))
     list_with_distances = []
@@ -109,8 +111,12 @@ def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
 # Среди них M вершин имеют степень равную 10. Значит
 # M/N  - вероятность того, что вершина имеет степень равную 10
 # и т.д.
-def degrees_probability(nodes):
-    pass
+def degrees_probability(graph, bin_number=10, bincount=True):
+    degrees = graph.node_degrees()  # словарь с deg
+    degrees = list(degrees.values())
+    if bincount:
+        return np.bincount(degrees)  # число вхождений каждой степени
+    return np.histogram(degrees)
 
 
 # число треугольников в неориентированном графе
@@ -136,9 +142,6 @@ def number_of_triangles(graph):
 # кластеризации. Он будет показывать вероятность того,
 # что две смежные к данной вершины тоже будут являться соседями
 def local_clustering_coefficient(graph, vertex):
-    # neighbors = list(set(graph.neighbors_for_node(vertex)))
-    # if vertex in neighbors:
-    #     neighbors.remove(vertex)
     neighbors = graph.adj_nodes(vertex)
     deg = len(neighbors)
     if deg < 2:
@@ -159,24 +162,10 @@ def average_clustering_coefficient(graph):
     result = 0
     for u in graph.nodes:
         result += local_clustering_coefficient(graph, u)
-        # deg = 0
-        # edges_number = 0
-        # neighbors = list(set(graph.neighbors_for_node(u)))
-        # if u in neighbors:
-        #     neighbors.remove(u)
-        # for v in neighbors:
-        #     deg += 1
-        #     for w in neighbors:
-        #         if w != v and graph.adj_nodes_checking(v, w):
-        #             edges_number += 1
-        # if deg < 2:
-        #     continue
-        # else:
-        #     result += edges_number / (deg * (deg-1))
     return result / graph.nodes_count
 
 
-# подсчет открытых треугольников в графе
+# глобальный кластерный коэффициент по определению
 def global_clustering_coefficient(graph):
     numerator, denominator = 0, 0
     # n * (n-1) * (1/2) - number of triplets for node

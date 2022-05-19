@@ -104,6 +104,7 @@ class Graph:
         # возвращение вершин со степенью смежности (list with tuples)
         # в отсортированном по убыванию порядке
         deg = list(map(lambda node: (node[0], len(node[1])), self.edges.items()))
+        # [(u, 15), (v, 10), ...]
         return sorted(deg, key=lambda node: node[1], reverse=True)
 
     # def random_removing(self, x, most_degree=False):
@@ -138,6 +139,7 @@ class Graph:
         return subgraph
 
     def adj_nodes_checking(self, u, v):
-        if v in self.neighbors_for_node(u):
+        # проверка того, что разные вершины смежны между собой
+        if v in set(self.adj_nodes(u)):
             return True
         return False
