@@ -5,9 +5,9 @@ import numpy as np
 
 # плотность графа
 def density(graph):
-    e = graph.edges_count
-    k_graph_edges = 0.5 * e * (e - 1)
-    return e / k_graph_edges
+    v = graph.nodes_count
+    k_graph_edges = 0.5 * v * (v - 1)
+    return graph.edges_count / k_graph_edges
 
 
 # доля вершин в подграфе
