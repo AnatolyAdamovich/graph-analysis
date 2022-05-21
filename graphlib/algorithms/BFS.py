@@ -23,14 +23,16 @@ def BFS_geodesic(graph, start_u, largest=False):
         - эксцентриситет каждой вершины
 
     """
-    dist = dict([(node, -1) for node in graph.nodes])
+    # dist = dict([(node, -1) for node in graph.nodes])
+    dist = dict()
     dist[start_u] = 0
     available_nodes = deque()
     available_nodes.append(start_u)
     while available_nodes:
         current_node = available_nodes.popleft()
         for v in graph.adj_nodes(current_node):
-            if dist[v] == -1:
+            #if dist[v] == -1:
+            if v not in dist:
                 available_nodes.append(v)
                 dist[v] = dist[current_node] + 1
     if largest:
