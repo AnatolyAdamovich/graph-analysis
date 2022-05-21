@@ -1,6 +1,6 @@
 ''' Поиск компонент слабой и сильной связности в графах '''
 from .DFS import *
-
+from ..structures.digraph import Digraph
 
 # компоненты слабой связности
 def weakly_components(digraph, largest=False):
@@ -86,3 +86,23 @@ def strongly_components_kosaraju(digraph):
 
 
 # метаграф
+def meta_graph(digraph, scc=None):
+    # конденсанция исходного графа
+    # scc - компоненты сильной связности в виде списка кортежей
+    if scc is None:
+         scc = list(strongly_components_tarjan(digraph))
+
+    # вершины в метаграфе будут представлять собой множества вершин исходного digraph
+    nodes_in_meta = dict()
+    nodes_label = dict()
+    for index, component in enumerate(scc):
+        nodes_in_meta[index] = component
+        for v in component:
+            nodes_label[v] = index
+    edges_in_digraph = digraph.edges_list()
+    edges_in_meta = [(nodes_label[u], nodes_label[v]) for (u, v) in edges_in_digraph
+                     if nodes_label[u] != nodes_label[v]]
+    condensation = Digraph(name='meta-graph',
+                           nodes=nodes_in_meta,
+                           edges=edges_in_meta)
+    return condensation

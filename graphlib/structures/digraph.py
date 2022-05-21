@@ -9,6 +9,11 @@ class Digraph:
 
         if nodes is None:
             self._nodes = set()
+        elif type(nodes) is dict:
+            # в случае вершин с какой-то информацией, в частности мета-графы
+            information = nodes
+            vertices = nodes.keys()
+            self._nodes = set(vertices)
         else:
             self._nodes = set(nodes)
 
