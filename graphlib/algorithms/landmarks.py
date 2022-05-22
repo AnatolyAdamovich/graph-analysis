@@ -2,6 +2,7 @@
 Landmark-based
 """
 from .BFS import *
+from random import sample
 
 
 # --------------------DISTANCE--------------------------
@@ -63,7 +64,52 @@ def largest_degree_sample(graph, d):
     return landmarks
 
 
-def best_coverage_sample(graph, d):
+def best_coverage_sample(graph, d, M):
+    # d - число ландмарков
+    # M - число ребер для выбора Ландмарков
+    landmarks = []
+    edges_sample = sample(graph.edges_list(), k=M)
+    nodes_coverage_paths = dict()  # словарик, в котором для каждой вершины
+                                   # будут храниться индексы кратчайших путей, в которые она входит
+
+    all_paths = set([i for i in range(M)])  # номера кратчайших путей
+                                            # (чтобы не хранить все пути, будем хранить их номера)
+
+    for index_of_path, (u, v) in enumerate(edges_sample):
+        shortest_path = BFS_search(graph, start_u=u, finish_v=v)
+
+        for node in shortest_path[1:-1]:
+            if node in nodes_coverage_paths:
+                nodes_coverage_paths[node].add(index_of_path)  # добавляем номер пути
+            else:
+                nodes_coverage_paths[node] = {index_of_path}
+    if len(nodes_coverage_paths) < d:
+        print('Число вершин, покрываемых выбранными M путями, меньше числа выбираемых ландмарков d.'
+              ' Необходимо задать большее число пар M или меньшее число ландмарков d')
+        return None
+    j = 0
+    while j < d and len(all_paths) > 0:
+        j += 1
+        # выбираем вершину, покрывающую наибольшее число путей
+        vertex = max(nodes_coverage_paths, key=lambda elem: len(all_paths & nodes_coverage_paths[elem]))
+        all_paths = all_paths - nodes_coverage_paths[vertex]
+        del nodes_coverage_paths[vertex] # удаляем данную вершину из словаря
+        landmarks.append(vertex)
+    if j == d:
+        return landmarks
+    else:
+        rest = d - j
+        for i in range(rest):
+            vertex = max(nodes_coverage_paths, key=lambda elem: len(nodes_coverage_paths[elem]))
+            del nodes_coverage_paths[vertex]  # удаляем данную вершину из словаря
+            landmarks.append(vertex)
+        return landmarks
+
+
+
+
+
+
     return 0
 
 
