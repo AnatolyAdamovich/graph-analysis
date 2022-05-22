@@ -19,7 +19,7 @@ def approx_distance(dict_landmarks, s, t):
 
 
 # --------------------MAIN ALGORITHMS-------------------
-def landmark_basic(graph, number_of_landmarks, method='random'):
+def landmark_basic(graph, number_of_landmarks, method='random', M=None):
     """
     basic landmark algorithm
     Parameters:
@@ -27,6 +27,7 @@ def landmark_basic(graph, number_of_landmarks, method='random'):
         graph: Graph
         number_of_landmarks: int
         method: ['random', 'degree', 'coverage', 'centrality']
+        M: if method=='coverage'
     """
     distance_to_landmarks = dict()
 
@@ -35,7 +36,7 @@ def landmark_basic(graph, number_of_landmarks, method='random'):
     elif method == 'degree':
         landmarks = largest_degree_sample(graph, d=number_of_landmarks)
     elif method == 'coverage':
-        landmarks = best_coverage_sample(graph, d=number_of_landmarks)
+        landmarks = best_coverage_sample(graph, d=number_of_landmarks, M=M)
     elif method == 'centrality':
         landmarks = lowest_centrality_sample(graph, d=number_of_landmarks)
     else:
@@ -68,16 +69,21 @@ def best_coverage_sample(graph, d, M):
     # d - число ландмарков
     # M - число ребер для выбора Ландмарков
     landmarks = []
-    edges_sample = sample(graph.edges_list(), k=M)
+    vertices_first = graph.selection(M)
+    vertices_second = graph.selection(M)
+    pairs = [(u, v) for u, v in zip(vertices_first, vertices_second)]
+    print('Количество пар: ', len(pairs))
+    #edges_sample = sample(graph.edges_list(), k=M)
     nodes_coverage_paths = dict()  # словарик, в котором для каждой вершины
                                    # будут храниться индексы кратчайших путей, в которые она входит
 
     all_paths = set([i for i in range(M)])  # номера кратчайших путей
                                             # (чтобы не хранить все пути, будем хранить их номера)
 
-    for index_of_path, (u, v) in enumerate(edges_sample):
+    for index_of_path, (u, v) in enumerate(pairs):
         shortest_path = BFS_search(graph, start_u=u, finish_v=v)
-
+        if shortest_path is None or len(shortest_path) == 0:
+            continue
         for node in shortest_path[1:-1]:
             if node in nodes_coverage_paths:
                 nodes_coverage_paths[node].add(index_of_path)  # добавляем номер пути
