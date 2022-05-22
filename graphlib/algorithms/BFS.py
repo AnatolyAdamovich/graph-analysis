@@ -1,29 +1,27 @@
-'''
-Поиск в ширину.
-
-Может быть использован для поиска кратчайшего пути
-между двумя вершинами в невзвешенном графе
-(т.е. путь считается по количеству ребер, входящих в него)
-'''
 from collections import deque
 
 
 def BFS_geodesic(graph, start_u, largest=False):
     """Поиск в ширину с подсчетом геодезического расстояния.
-        Parameters
-        ----------
-        graph : Graph
-            Граф
-        start_u : int
-            Стартовая вершина
+
+    Parameters:
+    ----------
+        graph : graphlib.structure.Graph
+            неориентированный граф
+        start_u : any
+            стартовая вершина,от которой будет считаться расстояние до других вершин.
         largest : bool
-            Если True, то возвращает наибольшее расстояние от заданной вершины
+            если True, то возвращает наибольшее расстояние от start_u до некоторой достижимой вершины
 
-    Возвращает:
-        - эксцентриситет каждой вершины
+    Returns:
+    ----------
+        dist: dictionary
+            эксцентриситет каждой вершины
 
+    Examples:
+    ----------
+        BFS_geodesic(G, 'A') = {'B': 2, 'C': 3}
     """
-    # dist = dict([(node, -1) for node in graph.nodes])
     dist = dict()
     dist[start_u] = 0
     available_nodes = deque()
@@ -50,7 +48,30 @@ class StateOfNode:
 
 
 def BFS_search(graph, start_u, finish_v, length=False):
-    # поиск кратчайшего (по числу ребер) пути между двумя вершинами
+    """Поиск в ширину для нахождения кратчайшего геодезического расстояния между двумя вершинами.
+
+        Parameters:
+        ----------
+            graph : graphlib.structure.Graph
+                неориентированный граф
+            start_u : any
+                стартовая вершина
+            finish_v : any
+                конечная вершина
+            length : bool
+                если True, то возвращает геодезического расстояние между вершинами
+
+        Returns:
+        ----------
+            path: list
+                путь от start_u до finish_v в виде списка вершин; если пути не обнаружено, то None
+
+        Examples:
+        ----------
+            BFS_search(G, 'A', 'B') = ['A', 'C', 'D', 'B']
+
+            BFS_search(G, 'A', 'B', length=True) = 3
+        """
     if start_u == finish_v:
         return 0
     available_nodes = deque()

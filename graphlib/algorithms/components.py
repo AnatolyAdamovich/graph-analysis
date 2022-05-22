@@ -2,15 +2,59 @@
 from .DFS import *
 from ..structures.digraph import Digraph
 
-# компоненты слабой связности
+
 def weakly_components(digraph, largest=False):
+    """Поиск компонент слабой связности
+
+        Parameters:
+        ----------
+            digraph : graphlib.structure.DiGraph
+                ориентированный граф
+
+            largest : bool
+                если True, то возвращает номер наибольше компоненты
+
+        Returns:
+        ----------
+            cc_num: int
+                число компонент связности
+            max_component_number: int
+                номер наибольшей компоненты (если largest==True)
+            cc: dict
+                словарь, содержащий компоненты связности (каждая компонента характеризуется своим номером)
+
+        Examples:
+        ----------
+            weakly_components(DG) = 2,  {1: ['A', 'E', 'C', 'D'], 2: ['T', 'Y', 'R']}
+
+            weakly_components(DG, largest=True) = 2, 1, {1: ['A','E', 'C', 'D'], 2: ['T', 'Y', 'R']}
+    """
     graph = digraph.to_simple()
     return DFS_with_cc(graph, largest)
 
 
-# компоненты сильной связности
-# предпочтительнее использовать алгоритм Тарьяна (всего один обход в глубину)
 def strongly_components_tarjan(digraph):
+    """Поиск компонент сильной связности с помощью алгоритма Тарьяна,
+        который использует всего один проход в глубину и не требует рекурсии
+
+        Parameters:
+        ----------
+            digraph : graphlib.structure.DiGraph
+                ориентированный граф
+
+        Returns:
+        ----------
+            итератор на список сильно связных компонент
+
+        Examples:
+        ----------
+            list(strongly_components_tarjan(DG)) = [{'A', 'B', 'C'}, {'T', 'E}]
+
+            or
+
+            for scc in strongly_components_tarjan(DG): do something
+    """
+
     time_in = {}     # время входа в вершину
     ret = {}         # куда можно вернуться из вершины
     used = set()         # вершины, для которых определена компонента
@@ -53,8 +97,27 @@ def strongly_components_tarjan(digraph):
                         queue_for_scc.append(u)
 
 
-# альтернатива - алгоритм Косарайю (два обхода в глубину + рекурсивный DFS)
 def strongly_components_kosaraju(digraph):
+    """Поиск компонент сильной связности с помощью алгоритма Косарайю,
+        который использует всего два обхода в глубину и требует рекурсии,
+        поэтому не подходит для графов большой размерности
+
+        Parameters:
+        ----------
+            digraph : graphlib.structure.DiGraph
+                ориентированный граф
+
+        Returns:
+        ----------
+            scc: dictionary
+                словарь с компонентами сильной связности, где каждая компонента помечена номером
+
+        Examples:
+        ----------
+            strongly_components_kosaraju(DG) = {1: ['A', 'T', 'E'],  2: ['B', 'R']}
+
+    """
+
     # расположение вершин в порядке убывания времени выхода
     time_in, time_out = DFS_with_times_recursive(digraph)
     time_out = sorted(list(time_out.items()), key=lambda elem: elem[1])
@@ -85,9 +148,30 @@ def strongly_components_kosaraju(digraph):
     return scc
 
 
-# метаграф
 def meta_graph(digraph, scc=None):
-    # конденсанция исходного графа
+    """Построение мета-графа для исходного орграфа
+
+        Parameters:
+        ----------
+            digraph : graphlib.structure.DiGraph
+                ориентированный граф
+            scc : list
+                список компонент сильной связности (необязательный)
+
+        Returns:
+        ----------
+            condensation : graphlib.structure.DiGraph
+                конденсация исходного орграфа
+
+        Notes:
+        ----------
+            Мета-графа представляет собой граф, в котором вершинами являются компоненты сильной связности.
+            Ребра показывают связь разных компонент. Вершины представлены номерами (индексами соответствующих компонент).
+            Каждая вершина в мета-графе также хранит информацию о том, какие вершины исходного графа ей принадлежат
+            (в аттрибуте digraph.information).
+
+    """
+
     # scc - компоненты сильной связности в виде списка кортежей
     if scc is None:
          scc = list(strongly_components_tarjan(digraph))
@@ -102,7 +186,7 @@ def meta_graph(digraph, scc=None):
     edges_in_digraph = digraph.edges_list()
     edges_in_meta = [(nodes_label[u], nodes_label[v]) for (u, v) in edges_in_digraph
                      if nodes_label[u] != nodes_label[v]]
-    condensation = Digraph(name='meta-graph',
+    condensation = Digraph(name='meta-graph::' + digraph.name,
                            nodes=nodes_in_meta,
                            edges=edges_in_meta)
     return condensation

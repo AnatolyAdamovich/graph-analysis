@@ -3,8 +3,28 @@ from ..algorithms import BFS_geodesic, BFS_search
 import numpy as np
 
 
-# плотность графа
 def density(graph):
+    """Плотность графа
+
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph or DiGraph
+                граф
+
+        Returns:
+        ----------
+            density: float
+                плотность исходного графа
+        Examples:
+        ----------
+            density(G) = 0.445
+
+        Notes:
+        ----------
+            Плотность графа - это отношения числа его вершин к числу ребер в полном графе на том же числе вершин
+
+            Число ребер в полном графе вычисляется по формуле ( n * (n-1) ) / 2, где n - число вершин
+    """
     v = graph.nodes_count
     k_graph_edges = 0.5 * v * (v - 1)
     return graph.edges_count / k_graph_edges
@@ -119,14 +139,35 @@ def degrees_probability(graph, bin_number=10, bincount=True):
     return np.histogram(degrees)
 
 
-# число треугольников в неориентированном графе
-# перебираются все ребра (u,v) графа
-#    для всех соседей вершины u проверяется:
-#    сосед смежен с вершиной v?
-#    если да, то это очередной треугольник
-# разделить число найденных треугольников на 3
-# !!! Важно, чтобы проверялись РАЗНЫЕ вершины
 def number_of_triangles(graph):
+    """Число треугольников в графе (полных графов на 3 вершинах)
+
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph
+                неориентированный граф
+
+        Returns:
+        ----------
+            number : int
+                число треугольников в graph
+
+        Examples:
+        ----------
+            number_of_triangles(G) = 331
+
+        Notes:
+        ----------
+            перебираются все ребра (u,v) графа
+
+            для всех соседей вершины u проверяется:
+
+            сосед смежен с вершиной v?
+
+            если да, то это очередной треугольник
+
+            разделить число найденных треугольников на 3
+    """
     count = 0
     all_edges = iter(graph.edges_list())
     for (u, v) in all_edges:
@@ -138,10 +179,30 @@ def number_of_triangles(graph):
     return int(count / 3)
 
 
-# Для каждой вершины графа можно посчитать его коэффициент
-# кластеризации. Он будет показывать вероятность того,
-# что две смежные к данной вершины тоже будут являться соседями
 def local_clustering_coefficient(graph, vertex):
+    """Локальный кластерный коэффициент
+
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph
+                неориентированный граф
+            vertex : any
+                вершина, для которой требуется посчитать коэффициент
+
+        Returns:
+        ----------
+            coef : float
+                локальный кластерный коэффициент
+
+        Examples:
+        ----------
+            local_clustering_coefficient(G, 'A') = 0.4
+
+        Notes:
+        ----------
+            Локальный кластерный коэффициент показывает вероятность того,
+            что две смежные к данной вершины тоже будут являться смежными
+    """
     neighbors = graph.adj_nodes(vertex)
     deg = len(neighbors)
     if deg < 2:
@@ -156,17 +217,55 @@ def local_clustering_coefficient(graph, vertex):
     return edges_number/(deg*(deg-1))
 
 
-# Средний кластерный коэффициент: средний коэффициент кластеризации
-# (усредненная сумма коэффициентов)
 def average_clustering_coefficient(graph):
+    """Средний кластерный коэффициент графа
+
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph
+                неориентированный граф
+
+        Returns:
+        ----------
+            coef : float
+                средний кластерный коэффициент
+
+        Examples:
+        ----------
+            average_clustering_coefficient(G) = 0.63
+
+        Notes:
+        ----------
+            Представляет собой оценку глобального кластерного коэффициента
+            и вычисляется как усредненная сумма локальных кластерных коэффициентов
+    """
     result = 0
     for u in graph.nodes:
         result += local_clustering_coefficient(graph, u)
     return result / graph.nodes_count
 
 
-# глобальный кластерный коэффициент по определению
 def global_clustering_coefficient(graph):
+    """Глобальынй кластерный коэффициент графа
+
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph
+                неориентированный граф
+
+        Returns:
+        ----------
+            coef : float
+                глобальный кластерный коэффициент
+
+        Examples:
+        ----------
+            global_clustering_coefficient(G) = 0.63
+
+        Notes:
+        ----------
+            ...
+    """
     numerator, denominator = 0, 0
     # n * (n-1) * (1/2) - number of triplets for node
     # where n = number of neighbors
