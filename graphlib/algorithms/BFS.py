@@ -11,16 +11,19 @@ def BFS_geodesic(graph, start_u, largest=False):
         start_u : any
             стартовая вершина,от которой будет считаться расстояние до других вершин.
         largest : bool
-            если True, то возвращает наибольшее расстояние от start_u до некоторой достижимой вершины
+            если True, то возвращает наибольшее расстояние от start_u до некоторой достижимой вершины (эксцентриситет вершины)
 
     Returns:
     ----------
         dist: dictionary
-            эксцентриситет каждой вершины
-
+            словарь, содержащий геодезическое расстояние от start_u до всех достижимых из нее вершин
+        largest_distance: int
+            эксцентриситет вершины (в случае largest==true)
     Examples:
     ----------
         BFS_geodesic(G, 'A') = {'B': 2, 'C': 3}
+
+        BFS_geodesic(G, 'A', largest=True) = 3
     """
     dist = dict()
     dist[start_u] = 0
@@ -29,7 +32,6 @@ def BFS_geodesic(graph, start_u, largest=False):
     while available_nodes:
         current_node = available_nodes.popleft()
         for v in graph.adj_nodes(current_node):
-            #if dist[v] == -1:
             if v not in dist:
                 available_nodes.append(v)
                 dist[v] = dist[current_node] + 1
