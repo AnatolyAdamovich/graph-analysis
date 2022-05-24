@@ -1,6 +1,6 @@
 '''Функции для анализа графов и др.'''
-from ..algorithms import BFS_geodesic, BFS_search
-#  import numpy as np
+from ..algorithms import BFS_geodesic, BFS_search, select_landmarks,\
+    landmark_basic, landmark_lca, approx_distance_basic, approx_distance_lca
 
 
 def density(graph):
@@ -289,7 +289,7 @@ def average_clustering_coefficient(graph):
 
 
 def global_clustering_coefficient(graph):
-    """Глобальынй кластерный коэффициент графа
+    """Глобальный кластерный коэффициент графа
 
         Parameters:
         ----------
@@ -307,7 +307,7 @@ def global_clustering_coefficient(graph):
 
         Notes:
         ----------
-        ...
+            https://en.wikipedia.org/wiki/Clustering_coefficient
     """
     numerator, denominator = 0, 0
     # n * (n-1) * (1/2) - number of triplets for node
@@ -323,55 +323,82 @@ def global_clustering_coefficient(graph):
     return numerator/denominator
 
 
+def make_data_pairs(graph, number_of_pairs):
+    """Функция для создания заданного числа пар вершин с подсчитанным
+        геодезическим расстоянием между ними
 
-# # квантиль расстояния
-# def geodesic_percentile_approximate(graph, number=500, percent=50):
-#     nodes = list(graph.selection(x=number))
-#     list_with_distances = []
-#     while nodes:
-#         u = nodes.pop()
-#         for v in nodes:
-#             d = BFS_search(graph, start_u=u, finish_v=v, length=True)
-#             list_with_distances.append(d)
-#     list_with_distances.sort()
-#     n = len(list_with_distances)
-#     index_of_percentile = round(n*(percent/100))-1
-#     return list_with_distances[index_of_percentile]
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph
+                неориентированный граф
+            number_of_pairs : graphlib.structures.Graph
+                количество пар
 
-# # оценка радиуса (наименьшее расстояние из наибольших)
-# def radius_approximate(graph,  number=500, nodes=None, with_nodes=False):
-#     if nodes is None:
-#         nodes = list(graph.selection(x=number))
-#     else:
-#         nodes = list(nodes)
-#     r = 1000000000
-#     node1, node2 = None, None
-#     for u in nodes:
-#         max_geodesic_dist_for_u = 0
-#         tmp_node = None
-#         # поиск наибольшего расстояния между 'u' и другой вершиной
-#         for v in nodes:
-#             geo_dist = BFS_search(graph, start_u=u, finish_v=v, length=True)
-#             if geo_dist > max_geodesic_dist_for_u:
-#                 max_geodesic_dist_for_u = geo_dist
-#                 tmp_node = v
-#         # поиск наименьшего среди наибольших
-#         if max_geodesic_dist_for_u < r:
-#             node1, node2 = u, tmp_node
-#             r = max_geodesic_dist_for_u
-#     if with_nodes:
-#         return r, node1, node2
-#     return r
+        Returns:
+        ----------
+            data : list
+                список кортежей вида: (вершина1, вершина2, расстояние между ними)
+
+        Examples:
+        ----------
+            make_data(G, 3) = [('A', 'B', 3), ('T', 'K', 10), ('U', 'L', 5)]
+
+    """
+    i = 0
+    data = []
+    while i < number_of_pairs:
+        node1, node2 = list(graph.selection(2))
+        dist = BFS_search(graph, node1, node2, length=True)
+        if dist is not None:
+            data.append((node1, node2, dist))
+            i += 1
+    return data
 
 
-# Пусть степень вершины - это случайная величина.
-# Считаем относительные частоты. Например, всего N вершин.
-# Среди них M вершин имеют степень равную 10. Значит
-# M/N  - вероятность того, что вершина имеет степень равную 10
-# и т.д.
-# def degrees_probability(graph, bin_number=10, bincount=True):
-#     degrees = graph.node_degrees()  # словарь с deg
-#     degrees = list(degrees.values())
-#     if bincount:
-#         return np.bincount(degrees)  # число вхождений каждой степени
-#     return np.histogram(degrees)
+def experiment(graph, data_real_distances, algorithm, selection_strategy,
+               N_of_landmarks, N_of_pairs_for_coverage=None):
+    """Функция для проведения эксперимента и вычисления approximate error
+
+        Parameters:
+        ----------
+            graph : graphlib.structures.Graph
+                неориентированный граф
+            data_real_distances : list
+                список пар вершин с реально подсчитанным геодезическим расстоянием между ними
+            algorithm : ['basic', 'LCA']
+                алгоритм оценивания; см. функции alg.landmark_basic, alg.landmark_lca
+            selection_strategy : ['random', 'centrality', 'coverage', 'degree']
+                алгоритм отбора ландмарков; см. функцию alg.select_landmarks
+            N_of_landmarks : int
+                количество ландмарков для отбора
+            N_of_pairs_for_coverage : int
+                количество пар для best_coverage_sampling
+
+        Returns:
+        ----------
+            approx_error : float
+                ошибку приближения при заданных параметрах
+
+        Examples:
+        ----------
+            experiment(G, data, 'basic', 'degree', 100) = 0.25
+
+    """
+
+    landmarks = select_landmarks(graph, method=selection_strategy,
+                                 number_of_landmarks=N_of_landmarks,
+                                 number_of_pairs=N_of_pairs_for_coverage)
+    approx_error = 0
+    if algorithm == 'basic':
+        embedding = landmark_basic(graph, landmarks)
+        for s, t, real_d in data_real_distances:
+            estimate_of_distance = approx_distance_basic(embedding, s, t)
+            approx_error += (estimate_of_distance-real_d)/real_d
+        approx_error /= len(data_real_distances)
+    elif algorithm == 'LCA':
+        dictionary_with_spt = landmark_lca(graph, landmarks)
+        for s, t, real_d in data_real_distances:
+            estimate_of_distance = approx_distance_lca(dictionary_with_spt, s, t)
+            approx_error += (estimate_of_distance-real_d)/real_d
+        approx_error /= len(data_real_distances)
+    return approx_error
