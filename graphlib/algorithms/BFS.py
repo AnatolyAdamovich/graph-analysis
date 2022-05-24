@@ -104,3 +104,49 @@ def BFS_search(graph, start_u, finish_v, length=False):
     return None
 
 
+def BFS_with_SPT(graph, root_vertex):
+    """Поиск в ширину для нахождения дерева кратчайших путей с корневой вершиной root_vertex
+
+        Parameters:
+        ----------
+            graph : graphlib.structure.Graph
+                неориентированный граф
+            root_vertex : any
+                вершина, от которой будет строиться дерево (корневая)
+
+        Returns:
+        ----------
+            spt : dict
+                дерево кратчайших путей в виде словаря
+
+        Examples:
+        ----------
+            BFS_with_SPT(G, 'A') = {'B': StateOfNode(), 'C': StateOfNode(), ...}
+
+        Notes:
+        ----------
+            Для хранения дерева используются структуры, хранящие ссылки на родительские узлы.
+            Например, если при обходе BFS сначала был осуществлен спуск в вершину 'B',
+            а затем в вершину 'C', то StateOfNode() для 'B' будет хранить вершину 'C'
+            в качестве родительского узла.
+            Это позволит восстановить путь от любой (достигнутой) вершины до корня.
+        """
+    spt = dict()
+    available_nodes = deque()
+    start_state = StateOfNode(root_vertex, None)
+
+    available_nodes.append(start_state)
+    visited = {root_vertex}
+
+    while available_nodes:
+        current_state = (available_nodes.popleft())
+        current_node = current_state.node
+        for v in graph.adj_nodes(current_node):
+            if v not in visited:
+                visited.add(v)
+                new_state = StateOfNode(v, current_state)
+                spt[v] = new_state
+                available_nodes.append(new_state)
+
+    return spt
+
