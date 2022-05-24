@@ -378,9 +378,9 @@ def best_coverage_sample(graph, d, M):
     """
 
     landmarks = []
-    vertices = graph.selection(2*M)
-    vertices_first = vertices[:M]
-    vertices_second = vertices[M:]
+    vertices = list(graph.selection(2*M))
+    vertices_first = set(vertices[:M])
+    vertices_second = set(vertices[M:])
     pairs = [(u, v) for u, v in zip(vertices_first, vertices_second)]
     nodes_coverage_paths = dict()  # словарик, в котором для каждой вершины
                                    # будут храниться индексы кратчайших путей, в которые она входит
