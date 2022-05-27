@@ -1,7 +1,7 @@
 '''Функции для анализа графов и др.'''
 from ..algorithms import BFS_geodesic, BFS_search, select_landmarks,\
     landmark_basic, landmark_lca, approx_distance_basic, approx_distance_lca
-
+from time import time
 
 def density(graph):
     """Плотность графа
@@ -356,7 +356,7 @@ def make_data_pairs(graph, number_of_pairs):
 
 
 def experiment(graph, data_real_distances, algorithm, selection_strategy,
-               N_of_landmarks, N_of_pairs_for_coverage=None):
+               N_of_landmarks, N_of_pairs_for_coverage=None, with_time=False):
     """Функция для проведения эксперимента и вычисления approximate error
 
         Parameters:
@@ -373,11 +373,15 @@ def experiment(graph, data_real_distances, algorithm, selection_strategy,
                 количество ландмарков для отбора
             N_of_pairs_for_coverage : int
                 количество пар для best_coverage_sampling
+            with_time : bool
+                если True, то будет возвращен словарик, содержащий время работы каждого этапа
 
         Returns:
         ----------
             approx_error : float
                 ошибку приближения при заданных параметрах
+            dict_with_time: dictionary
+                время работы каждого этапа алгоритма (возвращается, если with_time==True)
 
         Examples:
         ----------
@@ -389,16 +393,48 @@ def experiment(graph, data_real_distances, algorithm, selection_strategy,
                                  number_of_landmarks=N_of_landmarks,
                                  number_of_pairs=N_of_pairs_for_coverage)
     approx_error = 0
-    if algorithm == 'basic':
-        embedding = landmark_basic(graph, landmarks)
-        for s, t, real_d in data_real_distances:
-            estimate_of_distance = approx_distance_basic(embedding, s, t)
-            approx_error += (estimate_of_distance-real_d)/real_d
-        approx_error /= len(data_real_distances)
-    elif algorithm == 'LCA':
-        dictionary_with_spt = landmark_lca(graph, landmarks)
-        for s, t, real_d in data_real_distances:
-            estimate_of_distance = approx_distance_lca(dictionary_with_spt, s, t)
-            approx_error += (estimate_of_distance-real_d)/real_d
-        approx_error /= len(data_real_distances)
-    return approx_error
+    if with_time:
+        dict_with_time = dict()
+        if algorithm == 'basic':
+            t_start = time()
+            embedding = landmark_basic(graph, landmarks)
+            t_finish = time()
+            dict_with_time['building'] = t_finish-t_start
+
+            t_start = time()
+            for s, t, real_d in data_real_distances:
+                estimate_of_distance = approx_distance_basic(embedding, s, t)
+                approx_error += (estimate_of_distance - real_d) / real_d
+            t_finish = time()
+
+            approx_error /= len(data_real_distances)
+            dict_with_time['estimation'] = t_finish-t_start
+        elif algorithm == 'LCA':
+            t_start = time()
+            dictionary_with_spt = landmark_lca(graph, landmarks)
+            t_finish = time()
+            dict_with_time['building'] = t_finish - t_start
+
+            t_start = time()
+            for s, t, real_d in data_real_distances:
+                estimate_of_distance = approx_distance_lca(dictionary_with_spt, s, t)
+                approx_error += (estimate_of_distance - real_d) / real_d
+            t_finish = time()
+
+            approx_error /= len(data_real_distances)
+            dict_with_time['estimation'] = t_finish - t_start
+        return approx_error, dict_with_time
+    else:
+        if algorithm == 'basic':
+            embedding = landmark_basic(graph, landmarks)
+            for s, t, real_d in data_real_distances:
+                estimate_of_distance = approx_distance_basic(embedding, s, t)
+                approx_error += (estimate_of_distance-real_d)/real_d
+            approx_error /= len(data_real_distances)
+        elif algorithm == 'LCA':
+            dictionary_with_spt = landmark_lca(graph, landmarks)
+            for s, t, real_d in data_real_distances:
+                estimate_of_distance = approx_distance_lca(dictionary_with_spt, s, t)
+                approx_error += (estimate_of_distance-real_d)/real_d
+            approx_error /= len(data_real_distances)
+        return approx_error
