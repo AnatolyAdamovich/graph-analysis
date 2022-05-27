@@ -107,18 +107,6 @@ class Graph:
         # [(u, 15), (v, 10), ...]
         return sorted(deg, key=lambda node: node[1], reverse=True)
 
-    # def random_removing(self, x, most_degree=False):
-    #     if most_degree:
-    #         # удаление x вершин наибольшей степени
-    #         nodes_for_removing = self.node_degrees()
-    #         nodes_for_removing = set(map(lambda node: node[0], nodes_for_removing[:x]))
-    #         saved_nodes = self.nodes - nodes_for_removing
-    #         return self.subgraph(nodes=saved_nodes)
-    #     else:
-    #         # удаление x случайных вершин
-    #         saved_nodes = self.random_selection(self.nodes_count - x)
-    #         return self.subgraph(nodes=saved_nodes)
-
     def subgraph(self, nodes=None, x=3):
         # подграф исходного графа
 
